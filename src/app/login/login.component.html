@@ -1,9 +1,8 @@
- <!-- As a link -->
- <nav class="navbar navbar-light bg-dark " >
+<nav class="navbar navbar-light bg-dark " >
     <a class="navbar-brand  " href="#" style="color:rgb(85, 98, 237);"><b>&#169; HAFC Bank Pvt.Ltd </b></a>
     <span class="quote text-light">Giving you freedom...</span>
     <br>
-    <h4 style="color: white;">{{aim}}</h4>
+    <h6 style="color: blue;">{{aim}}</h6>
   </nav>
   
   
@@ -15,24 +14,35 @@
                   
               </div>
               <div class="card-body">
-                  <form onsubmit="event.preventDefault();bank.authenticate()">
+                  <form (ngSubmit)="login()">
                       <div class="input-group form-group">
                           <div class="input-group-prepend">
                               <span class="input-group-text"><i class="fas fa-user"></i></span>
                           </div>
-                          <input type="text" (change)="acnoChange($event)" class="form-control" [placeholder]="accnum" id="login_accno" required>
-                          
+                          <!-- <input type="text" (change)="accnochange($event)"   class="form-control" [placeholder]="accnum" id="login_accno" required> -->
+                          <!--  login using template referencing variable -->
+                          <!-- <input type="text" #acno   class="form-control" [placeholder]="accnum" id="login_accno" required> -->
+                        <!-- two way binding -->
+                          <input type="text" name="acno" [(ngModel)]="acno"   class="form-control" [placeholder]="accnum" id="login_accno" required>
+
                       </div>
                       <div class="input-group form-group">
                           <div class="input-group-prepend">
                               <span class="input-group-text"><i class="fas fa-key"></i></span>
                           </div>
-                          <input type="password"  (change)="pwdChange($event)" class="form-control" placeholder="password" id="login_password" required>
-                      </div>
+                          <!-- using event binding using $event -->
+                          <!-- <input type="password"(change)="passwordchange($event)" class="form-control" placeholder="password" id="login_password" required> -->
+                          <!-- login using template referencing variable -->
+                          <!-- <input type="password" #pswd class="form-control" placeholder="password" id="login_password" required> -->
+                          <input type="password" name="pwd" [(ngModel)]="pwd"   class="form-control" [placeholder]="pswd" id="login_accno" required>
+
+                        </div>
                       
                       <div class="form-group">
-                          <input type="submit" (click)="login()" value="Login" class="btn float-right login_btn " style="width:50%" >
-                      </div>
+                          <!-- <input type="submit" (click)="login(acno,pswd)"  value="Login" class="btn float-right login_btn " style="width:50%" > -->
+                          <input type="submit"   value="Login" class="btn float-right login_btn " style="width:50%" >
+
+                        </div>
                   </form>
               </div>
               <p style="color:white;align-items:baseline;">Not a user? <a href="./register.html">Register</a></p>
