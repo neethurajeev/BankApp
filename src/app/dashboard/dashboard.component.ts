@@ -23,7 +23,7 @@ export class DashboardComponent implements OnInit {
 
 
   constructor(private ds:DataService,private fb:FormBuilder,private router:Router) {
-    this.user=this.ds.currentUser
+    this.user=JSON.parse(localStorage.getItem('currentUser') || '')
     this.loginDate=new Date()
    }
 
@@ -56,25 +56,39 @@ deposit(){
   var pwd=this.depositForm.value.pwd
   var amount=this.depositForm.value.amount
   if(this.depositForm.valid){
- const result= this.ds.deposit(acno,pwd,amount)
- if(result){
-   alert(amount+"successfully deposited,And new balance is :"+result)
- }
-}
-else{
-  alert("Invalid Form")
-}
+    // calling deposit in ds
+    this.ds.deposit(acno,pwd,amount)
+    .subscribe((result:any)=>{
+      if(result){
+        alert(result.message)
+      }
+    },
+    (result)=>{
+      alert(result.error.message)
+    }
+    )
+  }
+  else{
+    alert("Invalid form")
+  }
 }
 
+ 
 withdraw(){
   var acno=this.withdrawForm.value.acno
   var pwd=this.withdrawForm.value.pwd
   var amount=this.withdrawForm.value.amount
   if(this.withdrawForm.valid){
- const result= this.ds.withdraw(acno,pwd,amount)
- if(result){
-   alert(amount+"successfully debited,And new balance is :"+result)
- }
+ this.ds.withdraw(acno,pwd,amount)
+ .subscribe((result:any)=>{
+  if(result){
+    alert(result.message)
+  }
+},
+(result)=>{
+  alert(result.error.message)
+}
+)
 }
 else{
   alert("Invalid Form")
@@ -101,7 +115,17 @@ onCancel(){
 
 // ondelete--child
 onDelete(event:any){
-  alert("Delete Account " +event)
-}
+  this.ds.onDelete(event)
+  .subscribe((result:any)=>{
+   if(result){
+     alert(result.message)
+     this.router.navigateByUrl("")
+   }
+ },
+ (result:any)=>{
+   alert(result.error.message)
+ }
+ )
+ }
 
 }

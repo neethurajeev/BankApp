@@ -43,14 +43,23 @@ loginForm=this.fb.group({
     var acno=this.loginForm.value.acno
     var pwd=this.loginForm.value.pwd
     if(this.loginForm.valid){
-      
-    // call login in data service
-    const result=this.ds.login(acno,pwd)
-    if(result){
-      alert("Login success")
-      this.router.navigateByUrl("dashboard")
-    }
-  }
+
+      this.ds.login(acno,pwd)
+      .subscribe((result:any)=>{
+        if(result){
+          localStorage.setItem('currentAcno',JSON.stringify(result.currentAcno))
+          localStorage.setItem('currentUser',JSON.stringify(result.currentUser))
+          localStorage.setItem("token",JSON.stringify(result.token))
+          alert(result.message)
+          this.router.navigateByUrl("dashboard")
+        }
+      },
+      (result:any)=>{
+        alert(result.error.message)
+      }
+
+      )}
+   
   else{
     alert("Invalid form")
   }

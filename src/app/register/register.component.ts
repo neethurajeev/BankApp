@@ -17,6 +17,7 @@ export class RegisterComponent implements OnInit {
     acno:['',[Validators.required,Validators.pattern('[0-9]*')]],
     pwd:['',[Validators.required,Validators.pattern('[a-zA-Z0-9]*')]]
     })
+  ds: any;
 
   constructor(private db:DataService,private router:Router,private fb:FormBuilder) { }
 
@@ -25,18 +26,22 @@ export class RegisterComponent implements OnInit {
   register(){
    
     // alert("Register clicked")
-    var acno=this.registerForm.value.acno
-    var pwd=this.registerForm.value.pwd
     var uname=this.registerForm.value.uname
+    var acno=this.registerForm.value.acno
+    var password=this.registerForm.value.pwd
+   
     if(this.registerForm.valid){
-      const result=this.db.register(uname,acno,pwd)
-    if(result){
-      alert("sucessfully registered")
-      this.router.navigateByUrl("")
-    }
-    else{
-      alert("account already exist")
-    }
+
+      this.db.register(uname,acno,password)
+      .subscribe((result:any)=>{
+        if(result){
+          alert(result.message)
+          this.router.navigateByUrl("")
+        }
+      },
+      (result:any)=>{
+        alert(result.error.message)
+      })       
     }
     else{
       alert("Invalid form")

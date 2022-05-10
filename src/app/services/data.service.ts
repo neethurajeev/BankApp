@@ -1,164 +1,130 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
+const options={
+  headers:new HttpHeaders()
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-  
-  currentUser:any
+
+  currentUser: any
   currentAcno:any
 
-  // database
- database:any={
-  1000:{acno:1000,uname:"neethu",password:1000,balance:5000,transaction:[]},
-  1001:{acno:1001,uname:"anoop",password:1001,balance:4000,transaction:[]},
-  1002:{acno:1002,uname:"abhi",password:1002,balance:3000,transaction:[]}
- }
+  //database
+  database: any = {
 
-  constructor() { 
-    this.getDetails()
+    1000: { acno: 1000, uname: "Neer", password: 1000, balance: 5000, transaction: [] },
+    1001: { acno: 1001, uname: "Laisha", password: 1001, balance: 3000, transaction: [] },
+    1002: { acno: 1002, uname: "Vyom", password: 1002, balance: 4000, transaction: [] }
   }
 
-//  to save data in local storage
-    saveDetails(){
-      localStorage.setItem("database",JSON.stringify(this.database))
-      if(this.currentAcno){
-        localStorage.setItem("currentAcno",JSON.stringify(this.currentAcno))
-      }
-      if(this.currentUser){
-        localStorage.setItem("currentUser",JSON.stringify(this.currentUser))
-      }
-    }
+  constructor(private http:HttpClient) {
+    this.getDetails() }
+//To save data in local storage
+saveDetails(){
+  localStorage.setItem("database",JSON.stringify(this.database))
+  if(this.currentAcno){
+    localStorage.setItem("currentAcno",JSON.stringify(this.currentAcno))
+  }
+  if(this.currentUser){
+    localStorage.setItem("currentUser",JSON.stringify(this.currentUser))
+  }
+}
 
-// to get data from local storage
-  getDetails(){
-    if(localStorage.getItem("database")){
-      this.database=JSON.parse(localStorage.getItem("database")||'')
-    }
-    if(localStorage.getItem("currentAcno")){
-      this.currentAcno=JSON.parse(localStorage.getItem("currentAcno")||'')
-    }
-    if(localStorage.getItem("currentUser")){
-      this.currentUser=JSON.parse(localStorage.getItem("currentUser")||'')
-    }
+//to get data from local storage
+getDetails(){
+  if(localStorage.getItem("database")){
+    this.database=JSON.parse(localStorage.getItem("database")||'')
   }
 
-  // register-
-  register(uname:any,acno:any,password:any)
-  {
-    // var acno=parseInt(acno)
-    let database=this.database
-    if(acno in database){
-      // already exist acno
-      return false
-    }
-    else{
-      // add details in to db
-      database[acno]={
-        acno,
-        uname,
-        password,
-        balance:0,
-        transaction:[]
-      }
-      console.log(database);
-      this.saveDetails()
-      return true
-    }
+  if(localStorage.getItem("currentAcno")){
+    this.currentAcno=JSON.parse(localStorage.getItem("currentAcno")||'')
   }
 
-  login(acno:any,pwd:any){
-    // alert("Login Clicked!!!!")
-    
-    let database=this.database
-    if(acno in database){
-      if(pwd==database[acno]["password"])
-      {
-        this.currentUser=database[acno]["uname"]
-        this.currentAcno=acno
-        this.saveDetails()
-       return true
-      }
-      else{
-        alert("Invalid password")
-        return false
-      }
-
-    }
-    else{
-      alert("Invalid user")
-      return false
-    }
+  if(localStorage.getItem("currentUser")){
+    this.currentUser=JSON.parse(localStorage.getItem("currentUser")||'')
   }
+}
 
+
+  // register
+  register(uname: any, acno: any, password: any) {
+    const data={
+      uname,
+      acno,
+      password
+    }
+return this.http.post('http://localhost:3000/register',data)
+  }
+//login
+  login(acno: any, pwd: any) {
+
+
+    const data={
+      acno,
+      pwd
+    }
+     return this.http.post('http://localhost:3000/login',data)
+
+  }
   // deposit
-  deposit(acno:any,pwd:any,amt:any){
-  var amount=parseInt(amt)
-  let database=this.database
-  if(acno in database){
-    if(pwd==database[acno]["password"]){
-      database[acno]["balance"]+=amount
-
-      database[acno]["transaction"].push({
-        type:"Credit",
-        amount:amount
-      })
-
-      this.saveDetails()
-
-      return database[acno]["balance"]
-    }
-    else{
-      alert("Incorrect Password")
-      return false
-    }
+  deposit(acno: any, pwd: any, amount: any) {
+  const data={
+    amount,
+    acno,
+    pwd
   }
-  else{
-    alert("User doesnot exist")
-    return false
+  // depost api call
+  return this.http.post('http://localhost:3000/deposit',data,this.getOptions())
   }
-}
- // withdraw
- withdraw(acno:any,pwd:any,amt:any){
-  var amount=parseInt(amt)
-  let database=this.database
 
-  if(acno in database){
+  // add token to req header
+  getOptions(){
 
-    if(pwd==database[acno]["password"]){
+    // to fetch token
+    const token=JSON.parse(localStorage.getItem("token")|| '')
 
-      if( database[acno]["balance"]>amount){
-        database[acno]["balance"]-=amount
-
-        database[acno]["transaction"].push({
-          type:"Debit",
-          amount:amount
-        })
-
-        this.saveDetails()
-
-        return database[acno]["balance"]
-      }
-      else{
-        alert("Insufficient balance")
-        return false
-      }
+    // create http header
+    let headers=new HttpHeaders()
+    if(token){
+      headers=headers.append("x-access-token",token)
+      options.headers=headers
     }
-    else{
-      alert("Incorrect Password")
-      return false
+    return options
+  }
+  // withdraw
+  withdraw(acno: any, pwd: any, amount: any) {
+    const data={
+      amount,
+      acno,
+      pwd
     }
+    // depost api call
+    return this.http.post('http://localhost:3000/withdraw',data,this.getOptions())
   }
-  else{
-    alert("User doesnot exist")
-    return false
-  }
-}
+    
 
-// transaction
-transaction(acno:any){
-  return this.database[acno].transaction
+
+  //transaction 
+  transaction(acno:any){
+    const data={
+      acno
+    }
+    // depost api call
+    return this.http.post('http://localhost:3000/transaction',data,this.getOptions())
+  }
+    
+onDelete(acno:any){
+     // ondelete api call
+  return this.http.delete('http://localhost:3000/onDelete/'+acno,this.getOptions())
 
 }
-}
+  }
+
+
+
+
 

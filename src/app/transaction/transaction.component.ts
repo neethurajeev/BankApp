@@ -13,8 +13,17 @@ acno:any
 
   constructor(private ds:DataService) {
     
-    this.acno=this.ds.currentAcno
+    this.acno=JSON.parse(localStorage.getItem("currentAcno")||'')
     this.transaction=this.ds.transaction(this.acno)
+    .subscribe((result:any)=>{
+      if(result){
+        this.transaction=result.transaction
+      }
+    },
+    (result)=>{
+      alert(result.error.message)
+    }
+    )
     console.log(this.transaction);
     
    }
